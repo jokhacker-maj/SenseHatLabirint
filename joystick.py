@@ -8,7 +8,7 @@ coordinate = [0,0]
 def draw(mesh, color):
     for y in range(0, 8):
         for x in range(0, 8):
-            if mesh[y , x] == 1:
+            if mesh[x, y] == 1:
                 sense.set_pixel(x, y, 255, 0, 0) ## barvo bo treba dodat
                 
 def move(position, table):
@@ -53,9 +53,9 @@ def main():
         draw(table , "red")
         coordinate = move(coordinate, table)
         path.append(coordinate)
-        draw(path, "blue")
+        drawPath(path, "blue")
         time.sleep(0.3)
 
 while True:
     main()
-    
+    y 
