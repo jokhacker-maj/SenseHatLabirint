@@ -1,22 +1,14 @@
 import random
 
 def generate_maze(width, height):
-    # Adjust dimensions to be odd numbers
-    if width % 2 == 0:
-        width -= 1
-    if height % 2 == 0:
-        height -= 1
-
-    # Initialize the maze with walls
-    maze = [[0 for _ in range(width)] for _ in range(height)]
+    # Initialize the maze with walls (1)
+    maze = [[1 for _ in range(width)] for _ in range(height)]
     visited = [[False for _ in range(width)] for _ in range(height)]
     walls = []
 
-    # Starting point
-    start_x = random.randrange(1, width, 2)
-    start_y = random.randrange(1, height, 2)
-
-    maze[start_y][start_x] = 1
+    # Starting point at (0, 0)
+    start_x, start_y = 0, 0
+    maze[start_y][start_x] = 0  # Mark the starting cell as a path
     visited[start_y][start_x] = True
 
     # Add the neighboring walls of the starting cell to the wall list
@@ -28,17 +20,22 @@ def generate_maze(width, height):
         walls.remove((wx, wy, nx, ny))
 
         if not visited[ny][nx]:
-            # Break the wall and mark the new cell as part of the maze
-            maze[wy][wx] = 1
-            maze[ny][nx] = 1
+            # Break the wall and mark the new cell as a path
+            maze[wy][wx] = 0
+            maze[ny][nx] = 0
             visited[ny][nx] = True
 
             # Add the neighboring walls of the cell to the wall list
             walls.extend(get_walls(nx, ny, width, height, visited))
 
-    # Adjust the maze to an 8x8 grid
-    final_maze = adjust_maze(maze, 8, 8)
-    return final_maze
+    # Ensure the ending point at (7, 7) is a path
+    maze[height - 1][width - 1] = 0
+
+    # Optionally, connect the end point if it's isolated
+    connect_end_point(maze, width, height)
+
+    maze[7][-2] = 0
+    return maze
 
 def get_walls(x, y, width, height, visited):
     walls = []
@@ -49,29 +46,21 @@ def get_walls(x, y, width, height, visited):
         # Wall coordinates are between the current cell and the neighbor
         wx, wy = x + dx // 2, y + dy // 2
 
-        if (0 < nx < width) and (0 < ny < height) and not visited[ny][nx]:
+        if (0 <= nx < width) and (0 <= ny < height) and not visited[ny][nx]:
             walls.append((wx, wy, nx, ny))
     return walls
 
-def adjust_maze(maze, target_width, target_height):
-    # Add borders if necessary
-    width = len(maze[0])
-    height = len(maze)
-
-    # Add horizontal borders
-    while height < target_height:
-        maze.insert(0, [0]*width)
-        maze.append([0]*width)
-        height += 2
-
-    # Add vertical borders
-    for row in maze:
-        while len(row) < target_width:
-            row.insert(0, 0)
-            row.append(0)
-
-    # Trim the maze to the target size
-    return [row[:target_width] for row in maze[:target_height]]
+def connect_end_point(maze, width, height):
+    x, y = width - 1, height - 1
+    neighbors = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+    random.shuffle(neighbors)
+    for dx, dy in neighbors:
+        nx, ny = x + dx, y + dy
+        if 0 <= nx < width and 0 <= ny < height:
+            if maze[ny][nx] == 0:
+                # Break the wall between (x, y) and (nx, ny)
+                maze[(y + ny) // 2][(x + nx) // 2] = 0
+                return
 
 # Generate an 8x8 maze
 maze = generate_maze(8, 8)
