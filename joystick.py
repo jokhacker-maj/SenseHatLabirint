@@ -53,6 +53,7 @@ def main():
                 elif event.direction == "middle":
                     x = 0      
                     y = 0
+                    break
                 coordinate = move(coordinate, table, x, y)
         draw(table , "red")
         path.append(coordinate)
