@@ -58,6 +58,7 @@ def main():
         draw(table , "red")
         path.append(coordinate)
         drawPath(path, "blue")
+        sense.set_pixel(coordinate[0], coordinate[1], 0, 255, 0) # teba dodat barvo
         time.sleep(0.3)
  
 while True:
